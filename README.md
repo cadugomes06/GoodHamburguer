@@ -154,6 +154,5 @@ A entidade `Order` possui setters privados e expõe o método `ApplyItems()` par
 |------|--------|
 | **CRUD de itens do cardápio** | O cardápio é fixo conforme especificação. Não há necessidade de gerenciar itens via API. |
 | **Autenticação/Autorização** | Fora do escopo do desafio técnico. |
-| **Frontend em Blazor** | Item opcional do desafio, não implementado por questão de prazo. |
 | **Paginação em `GET /orders`** | Volume esperado de dados não justifica neste momento. |
 | **Testes de integração** | Optou-se por testes unitários da camada de negócio, cobrindo os casos mais críticos. Testes de integração exigiriam banco de dados em memória ou contêiner. |
