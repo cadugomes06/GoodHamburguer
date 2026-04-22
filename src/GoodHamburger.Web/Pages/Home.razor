@@ -1,0 +1,74 @@
+@page "/"
+@inject OrderApiService Api
+
+<PageTitle>Cardápio — Good Hamburger</PageTitle>
+
+<h1>Cardápio</h1>
+
+@if (menuItems is null && errorMessage is null)
+{
+    <p>Carregando...</p>
+}
+else if (menuItems is not null)
+{
+    var sandwiches = menuItems.Where(i => i.Type == "Sandwich").ToList();
+    var sides = menuItems.Where(i => i.Type != "Sandwich").ToList();
+
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Sanduíches</h4>
+            <ul class="list-group mb-4">
+                @foreach (var item in sandwiches)
+                {
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>@item.Name</span>
+                        <span class="text-success fw-bold">R$ @item.Price.ToString("F2")</span>
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <h4>Acompanhamentos</h4>
+            <ul class="list-group mb-4">
+                @foreach (var item in sides)
+                {
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>@item.Name</span>
+                        <span class="text-success fw-bold">R$ @item.Price.ToString("F2")</span>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+
+    <div class="alert alert-info">
+        <strong>Descontos disponíveis:</strong><br />
+        Sanduíche + Batata + Refrigerante → <strong>20% off</strong><br />
+        Sanduíche + Refrigerante → <strong>15% off</strong><br />
+        Sanduíche + Batata → <strong>10% off</strong>
+    </div>
+
+    <a href="orders/new" class="btn btn-warning mt-2">Fazer Pedido</a>
+}
+
+@if (errorMessage is not null)
+{
+    <div class="alert alert-danger mt-3">@errorMessage</div>
+}
+
+@code {
+    private List<MenuItemModel>? menuItems;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            menuItems = await Api.GetMenuAsync();
+        }
+        catch
+        {
+            errorMessage = "Não foi possível carregar o cardápio. Verifique se a API está rodando.";
+        }
+    }
+}

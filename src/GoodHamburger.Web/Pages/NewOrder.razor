@@ -1,0 +1,117 @@
+@page "/orders/new"
+@inject OrderApiService Api
+@inject NavigationManager Nav
+
+<PageTitle>Novo Pedido — Good Hamburger</PageTitle>
+
+<h1>Novo Pedido</h1>
+
+@if (menuItems is null && errorMessage is null)
+{
+    <p>Carregando cardápio...</p>
+}
+else if (menuItems is not null)
+{
+    var sandwiches = menuItems.Where(i => i.Type == "Sandwich").ToList();
+    var fries = menuItems.Where(i => i.Type == "Fries").ToList();
+    var drinks = menuItems.Where(i => i.Type == "Drink").ToList();
+
+    <EditForm Model="request" OnValidSubmit="SubmitOrder">
+        <div class="mb-3">
+            <label class="form-label fw-bold">Hambúrguer<span class="text-danger">*</span></label>
+            <InputSelect class="form-select" @bind-Value="request.SandwichId">
+                <option value="0">Selecione...</option>
+                @foreach (var item in sandwiches)
+                {
+                    <option value="@item.Id">@item.Name — R$ @item.Price.ToString("F2")</option>
+                }
+            </InputSelect>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Batata Frita</label>
+            <InputSelect class="form-select" @bind-Value="request.FriesId">
+                <option value="">Nenhuma</option>
+                @foreach (var item in fries)
+                {
+                    <option value="@item.Id">@item.Name — R$ @item.Price.ToString("F2")</option>
+                }
+            </InputSelect>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Bebidas</label>
+            <InputSelect class="form-select" @bind-Value="request.DrinkId">
+                <option value="">Nenhum</option>
+                @foreach (var item in drinks)
+                {
+                    <option value="@item.Id">@item.Name — R$ @item.Price.ToString("F2")</option>
+                }
+            </InputSelect>
+        </div>
+
+        @if (errorMessage is not null)
+        {
+            <div class="alert alert-danger">@errorMessage</div>
+        }
+
+        <button type="submit" class="btn btn-warning" disabled="@isSubmitting">
+            @(isSubmitting ? "Enviando..." : "Confirmar Pedido")
+        </button>
+        <a href="orders" class="btn btn-outline-secondary ms-2">Cancelar</a>
+    </EditForm>
+}
+
+@if (errorMessage is not null && menuItems is null)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+@code {
+    private List<MenuItemModel>? menuItems;
+    private CreateOrderRequest request = new();
+    private string? errorMessage;
+    private bool isSubmitting;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            menuItems = await Api.GetMenuAsync();
+        }
+        catch
+        {
+            errorMessage = "Não foi possível carregar o cardápio.";
+        }
+    }
+
+    private async Task SubmitOrder()
+    {
+        if (request.SandwichId == 0)
+        {
+            errorMessage = "Selecione um sanduíche.";
+            return;
+        }
+
+        isSubmitting = true;
+        errorMessage = null;
+
+        try
+        {
+            await Api.CreateOrderAsync(request);
+            Nav.NavigateTo("/orders");
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        {
+            errorMessage = "Pedido inválido. Verifique os itens selecionados.";
+        }
+        catch
+        {
+            errorMessage = "Erro ao criar o pedido. Tente novamente.";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}

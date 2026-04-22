@@ -1,0 +1,20 @@
+# Build
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Secrets — NUNCA commitar
+.env
+appsettings.Development.json
+
+# .env.example DEVE ser commitado (sem valores reais)
+
+# Logs
+*.log
+
+# Pacotes NuGet restaurados localmente
+packages/
