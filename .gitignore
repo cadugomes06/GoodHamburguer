@@ -18,3 +18,8 @@ appsettings.Development.json
 
 # Pacotes NuGet restaurados localmente
 packages/
+
+# Claude Code
+.claude/
+CLAUDE.md
+*.claude.json
