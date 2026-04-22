@@ -1,4 +1,4 @@
-# Good Hamburger API
+# Good Hamburger APP
 
 API REST para registro de pedidos da lanchonete **Good Hamburger**, desenvolvida em C# com ASP.NET Core 9.
 
